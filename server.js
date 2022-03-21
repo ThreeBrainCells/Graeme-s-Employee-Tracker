@@ -1,10 +1,7 @@
 //imports and requires
-const express = require('express');
+require("console.table")
 const mysql = require('mysql2');
 const inquirer = require('inquirer')
-
-const PORT = process.env.PORT || 3001;
-const app = express();
 
 const db = mysql.createConnection(
   {
@@ -32,11 +29,11 @@ const interfaceQuestion = [{
     "Add Department",
     "Quit"]
 }]
-const addDepartmentQuestion = {
+const addDepartmentQuestion = [{
   type: "input",
   message: "What is this new department called?",
   name: "DeptName"
-}
+}]
 
 const addRoleQuestions = [
   {
@@ -80,7 +77,7 @@ function startmenu(){
   .then(function(response){
     switch(response.choice){
       case "View All Employees":
-        ViewAllEmployees()
+        viewAllEmployees()
         break;
       case "Add Employee":
         addEmployee()
@@ -104,5 +101,39 @@ function startmenu(){
         db.end()
         process.exit(0)
     }
+  })
+}
+
+function viewAllEmployees(){
+  db.query("SELECT * FROM employees", function(err,data){
+    if(err)throw err
+    console.table(data)
+    startmenu()
+  })
+};
+function viewAllRoles(){
+  db.query("SELECT * FROM roles", function(err,data){
+    if(err)throw err
+    console.table(data)
+    startmenu()
+  })
+};
+function viewAllDepts(){
+  db.query("SELECT * FROM departments", function(err,data){
+    if(err)throw err
+    console.table(data)
+    startmenu()
+  })
+};
+
+function addDept(){
+  inquirer.prompt(addDepartmentQuestion)
+  .then(function(response){
+    db.query("INSERT INTO departments (department_name) VALUES (?)",
+    response.DeptName,
+     function(err,data){
+      if(err)throw err
+      startmenu()
+    })
   })
 }
