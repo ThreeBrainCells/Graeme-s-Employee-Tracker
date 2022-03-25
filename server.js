@@ -35,7 +35,7 @@ const addDepartmentQuestion = [{
   name: "DeptName"
 }]
 
-const addRoleQuestions = [
+let addRoleQuestions = [
   {
     type: "input",
     message: "What is this new role called?",
@@ -48,10 +48,10 @@ const addRoleQuestions = [
     type: "list",
     message: "What department is this role in?",
     name: "RoleDept",
-    //choices: [Once i figure out how to pass in the departments from the database]
+    // choices: []
   }
 ]
-const addEmployeeQuestions = [
+let addEmployeeQuestions = [
   {
     type: "input",
     message: "What is the new employee's first name?",
@@ -72,6 +72,20 @@ const addEmployeeQuestions = [
     // choices: [, "No Manager"]
   }
 ]
+let updateEmployeeQuestions = [
+  {
+    type: "list",
+    message: "Which employee are you updating?",
+    name: "Updatee",
+    //choices: []
+  },{
+    type: "list",
+    message: "What is their new role?",
+    name: "newRole",
+    //choices: []
+  }
+]
+
 function startmenu(){
   inquirer.prompt(interfaceQuestion)
   .then(function(response){
@@ -88,9 +102,9 @@ function startmenu(){
       case "View All Roles":
         viewAllRoles()
         break;
-        case "Add Role":
-          addRole()
-          break;
+      case "Add Role":
+        addRole()
+        break;
       case "View All Departments":
         viewAllDepts()
         break;
@@ -105,21 +119,21 @@ function startmenu(){
 }
 
 function viewAllEmployees(){
-  db.query("SELECT * FROM employees", function(err,data){
+  db.query("SELECT employees.first_name AS Fname, employees.last_name AS Lname, roles.title AS Role, employees.id, CONCAT(manager.first_name, ' ', manager.last_name) AS manager from employees LEFT JOIN employees manager ON manager.id = employees.manager_id JOIN roles ON roles.id = employees.roles_id;", function(err,data){
     if(err)throw err
     console.table(data)
     startmenu()
   })
 };
 function viewAllRoles(){
-  db.query("SELECT * FROM roles", function(err,data){
+  db.query("SELECT departments.department_name, roles.title, roles.salary FROM roles JOIN departments ON roles.department_id = departments.id;", function(err,data){
     if(err)throw err
     console.table(data)
     startmenu()
   })
 };
 function viewAllDepts(){
-  db.query("SELECT * FROM departments", function(err,data){
+  db.query("SELECT * FROM departments;", function(err,data){
     if(err)throw err
     console.table(data)
     startmenu()
@@ -132,6 +146,45 @@ function addDept(){
     db.query("INSERT INTO departments (department_name) VALUES (?)",
     response.DeptName,
      function(err,data){
+      if(err)throw err
+      startmenu()
+    })
+  })
+}
+
+function addRole(){
+  inquirer.prompt(addRoleQuestions)
+  .then(function(response){
+    db.query("INSERT INTO roles (title, salary, department_id) VALUES (?)",
+    response.firstName,
+    response.lastName,
+    // response.RoleDept,
+     function(err,data){
+      if(err)throw err
+      startmenu()
+    })
+  })
+}
+
+function addEmployee(){
+  inquirer.prompt(addEmployeeQuestions)
+  .then(function(response){
+    db.query("INSERT INTO employees (first_name, last_name, roles_id, manager_id) VALUES (?)",
+    response.RoleName,
+    response.RoleSalary,
+    //response.empRole
+    // response.empManager,
+     function(err,data){
+      if(err)throw err
+      startmenu()
+    })
+  })
+}
+
+function updateEmployeeRole(){
+  inquirer.prompt(updateEmployeeQuestions)
+  .then(function(response){
+    db.query(`UPDATE employees SET roles_id = ${response.newRole} WHERE employees.first_name = ${response.Updatee}`, function(err, data){
       if(err)throw err
       startmenu()
     })

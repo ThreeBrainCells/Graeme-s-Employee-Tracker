@@ -20,7 +20,7 @@ VALUES ("Manager", 100.69, 1),
         ("Engineer", 27.12, 4),
         ("Hiring Coordinator", 26.51, 5);
 
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
+INSERT INTO employees (first_name, last_name, roles_id, manager_id)
 VALUES ("Graeme", "Montrose", 3, NULL),
         ("Remy", "Linguini", 1, NULL),
         ("Anton", "Gemans", 2, NULL),
