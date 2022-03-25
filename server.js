@@ -13,7 +13,10 @@ const db = mysql.createConnection(
 db.connect(function (err) {
   if (err) throw err;
   console.log(`Connected to the company_db database.`)
-
+  callDepts()
+  callRoles()
+  callManagers()
+  callEmployees()
    startmenu()
 })
 
@@ -37,7 +40,7 @@ const addDepartmentQuestion = [{
 }]
 let deptArr =[]
 function callDepts(){
-  db.query('SELECT * FROM departments', function(err, data){
+  db.query('SELECT * FROM departments;', function(err, data){
     //loop through an array, capture each individual object, push value of said objec into deptArr
     for (let index = 0; index < data.length; index++) {
       let objects = data[index];
@@ -74,7 +77,7 @@ function callRoles(){
 }
 let managerArr =[]
 function callManagers(){
-  db.query("SELECT CONCAT(employees.first_name, ' ', employees.last_name) AS fullName FROM employees WHERE manager_id IS NULL", function(err, data){
+  db.query("SELECT CONCAT(employees.first_name, ' ', employees.last_name) AS fullName FROM employees WHERE manager_id IS NULL;", function(err, data){
     for (let index = 0; index < data.length; index++) {
       let objects = data[index];
       managerArr.push(objects.fullName)
@@ -104,11 +107,12 @@ let addEmployeeQuestions = [
 ]
 let employeeArr = []
 function callEmployees(){
-  db.query("SELECT employees.first_name FROM employees", function(err, data){
+  db.query("SELECT employees.first_name AS Name FROM employees;", function(err, data){
+    if(err)throw err;
     for (let index = 0; index < data.length; index++) {
-      const objects = data[index];
-      employeeArr.push(objects.first_name)
-    }
+      let Empobjects = data[index];
+      employeeArr.push(Empobjects.Name)
+     }
   })
 }
 let updateEmployeeQuestions = [
@@ -182,7 +186,7 @@ function viewAllDepts(){
 function addDept(){
   inquirer.prompt(addDepartmentQuestion)
   .then(function(response){
-    db.query("INSERT INTO departments (department_name) VALUES (?)",
+    db.query("INSERT INTO departments (department_name) VALUES (?);",
     response.DeptName,
      function(err,data){
       if(err)throw err
@@ -196,7 +200,7 @@ function addRole(){
   inquirer.prompt(addRoleQuestions)
   .then(function(response){
     let deptID = deptArr.indexOf(response.RoleDept) + 1;
-    db.query("INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)",
+    db.query("INSERT INTO roles (title, salary, department_id) VALUES (?,?,?);",
     [response.RoleName,
     response.RoleSalary,
     deptID],
@@ -214,7 +218,7 @@ function addEmployee(){
   .then(function(response){
     let roleID = rolesArr.indexOf(response.empRole) + 1;
     let managerID = managerArr.indexOf(response.empManager) + 1
-    db.query("INSERT INTO employees (first_name, last_name, roles_id, manager_id) VALUES (?,?,?,?)",
+    db.query("INSERT INTO employees (first_name, last_name, roles_id, manager_id) VALUES (?,?,?,?);",
     [response.firstName,
     response.lastName,
     roleID,
@@ -231,8 +235,11 @@ function updateEmployeeRole(){
   callEmployees()
   inquirer.prompt(updateEmployeeQuestions)
   .then(function(response){
-    let roleID = rolesArr.indexOf(response.empRole) + 1;
-    db.query(`UPDATE employees SET roles_id = ${roleID} WHERE employees.first_name = ${response.Updatee}`, function(err, data){
+    console.log(response.newRole)
+    console.log(response.Updatee)
+    let roleID = rolesArr.indexOf(response.newRole) + 1;
+    console.log(roleID)
+    db.query(`UPDATE employees SET roles_id = ${roleID} WHERE employees.first_name = "${response.Updatee}"`, function(err, data){
       if(err)throw err
       startmenu()
     })
