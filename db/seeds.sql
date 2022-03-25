@@ -9,11 +9,11 @@ VALUES ("Finance"),
         ("Human Resources");
 
 INSERT INTO roles (title, salary, department_id)
-VALUES ("Manager", 100.69, 1),
-        ("Manager", 100.69, 2),
-        ("Manager", 100.69, 3),
-        ("Manager", 100.69, 4),
-        ("Manager", 100.69, 5),
+VALUES ("Finance Manager", 100.69, 1),
+        ("Marketing Manager", 100.69, 2),
+        ("Research Manager", 100.69, 3),
+        ("Engineering Manager", 100.69, 4),
+        ("HR Manager", 100.69, 5),
         ("Accountant", 15.01, 1),
         ("Commercial Writer", 13.99, 2),
         ("Designer", 25.23, 3),
